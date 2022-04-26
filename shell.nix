@@ -7,7 +7,7 @@ mkShell {
     ];
 
     shellHook = ''
-        export REACH_CONNECTOR_MODE=ALGO-devnet
+        export REACH_CONNECTOR_MODE=ETH-devnet
         export PATH=$PWD/node_modules/.bin:$PATH
     '';
 }
