@@ -32,9 +32,10 @@ let total = 0;
 let moment = curTime;
 while (total < params.amount) {
   await stdlib.waitUntilTime(moment);
-  const released = (await creatorCtc.a.release()).toNumber();
+  const res = (await creatorCtc.a.release());
+  const [ released, curTime ] = res.map((x) => x.toNumber());
   total += released;
-  console.log(`Waited until ${moment}, released ${released} (total ${total})`);
+  console.log(`Waited until ${moment}, current time ${curTime}; released ${released} (total ${total})`);
   moment += 10;
 }
 

@@ -13,7 +13,7 @@ export const main = Reach.App(() => {
   });
   
   const Api = API({
-    release: Fun([], UInt),
+    release: Fun([], Tuple(UInt, UInt)),
   });
 
   init();
@@ -34,8 +34,7 @@ export const main = Reach.App(() => {
 
   const [ released ] = parallelReduce([ 0 ])
     .define(() => {
-      const vested = () => {
-        const curTime = thisConsensusTime();
+      const vested = (curTime) => {
         const totalAmount = balance() + released;
 
         if (curTime < start) {
@@ -47,14 +46,15 @@ export const main = Reach.App(() => {
         }
       }
 
-      const releasable = () => vested() - released;
+      const releasable = (time) => vested(time) - released;
     })
-    .invariant(released >= 0 && releasable() >= 0)
+    .invariant(released >= 0 && releasable(thisConsensusTime()) >= 0)
     .while(balance() > 0)
     .api(Api.release, (callback) => {
-      const toRelease = releasable();
+      const curTime = thisConsensusTime();
+      const toRelease = releasable(curTime);
       transfer(toRelease).to(Creator);
-      callback(toRelease);
+      callback([toRelease, curTime]);
       return [ released + toRelease ];
     });
       
